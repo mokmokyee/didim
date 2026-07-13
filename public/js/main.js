@@ -795,7 +795,6 @@
       }
       if (p.dDay !== null) info.push(["D-Day", dDayText(p.dDay)]);
       info.push(["조회수", p.viewCount.toLocaleString("ko-KR")]);
-      if (p.createdAt) info.push(["등록일", formatDate(p.createdAt)]);
       if (p.contact) info.push(["문의처", p.contact]);
 
       const primaryAction = closed

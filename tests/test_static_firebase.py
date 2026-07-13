@@ -51,6 +51,11 @@ def test_target_resolver_is_loaded_by_the_firebase_adapter():
     assert '"전 연령"' in resolver
 
 
+def test_program_detail_does_not_show_registration_date():
+    main = (ROOT / "public" / "js" / "main.js").read_text(encoding="utf-8")
+    assert 'info.push(["등록일"' not in main
+
+
 def test_service_credentials_are_ignored():
     ignored = (ROOT / ".gitignore").read_text(encoding="utf-8")
     assert "firebase-service-account*.json" in ignored
