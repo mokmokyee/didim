@@ -55,3 +55,13 @@ def test_deploy_generates_browser_gemini_config_from_secret():
     assert "secrets.GEMINI_API_KEY" in workflow
     assert "npm run gemini-runtime:write" in workflow
     assert "process.env.GEMINI_API_KEY" in writer
+
+
+def test_browser_gemini_calls_use_the_free_tier_guard():
+    adapter = (ROOT / "public" / "js" / "api.js").read_text(encoding="utf-8")
+    guard = (ROOT / "public" / "js" / "gemini-rate-guard.mjs").read_text(encoding="utf-8")
+    assert "gemini-rate-guard.mjs" in adapter
+    assert "geminiRateGuard.reserve" in adapter
+    assert "minimumIntervalMs: 61000" in guard
+    assert "tpm: 250000" in guard
+    assert "rpd: 400" in guard

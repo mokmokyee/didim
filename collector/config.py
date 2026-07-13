@@ -42,9 +42,9 @@ class Config:
 
     GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
     GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite").strip()
-    GEMINI_INTERNAL_RPM = int(os.getenv("GEMINI_INTERNAL_RPM", "14"))
-    GEMINI_INTERNAL_RPD = int(os.getenv("GEMINI_INTERNAL_RPD", "480"))
-    GEMINI_MAX_ATTEMPTS = int(os.getenv("GEMINI_MAX_ATTEMPTS", "2"))
+    GEMINI_INTERNAL_RPM = int(os.getenv("GEMINI_INTERNAL_RPM", "1"))
+    GEMINI_INTERNAL_RPD = int(os.getenv("GEMINI_INTERNAL_RPD", "80"))
+    GEMINI_MAX_ATTEMPTS = int(os.getenv("GEMINI_MAX_ATTEMPTS", "1"))
 
     FIREBASE_SERVICE_ACCOUNT_PATH = _service_account_path()
     FIREBASE_SERVICE_ACCOUNT_JSON = os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON", "").strip()

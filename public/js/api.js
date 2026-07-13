@@ -12,6 +12,7 @@
   const configModuleUrl = new URL("firebase-config.js", scriptBase).href;
   const geminiRuntimeConfigUrl = new URL("gemini-runtime-config.js", scriptBase).href;
   const regionResolverModuleUrl = new URL("region-resolver.mjs?v=20260714-1", scriptBase).href;
+  const geminiRateGuardModuleUrl = new URL("gemini-rate-guard.mjs?v=20260714-1", scriptBase).href;
 
   const TYPE_ALIASES = {
     contest: "공모전",
@@ -49,6 +50,8 @@
   let authReady = Promise.resolve(null);
   let firebaseEnabled = false;
   let regionResolver = null;
+  let geminiRateGuard = null;
+  let geminiRateLimits = null;
   let opportunityCache = null;
   let configuredGeminiModel = "gemini-3.1-flash-lite";
   let searchResolverPromise = null;
@@ -64,9 +67,15 @@
 
   async function initialize() {
     try {
-      const modules = await Promise.all([import(configModuleUrl), import(regionResolverModuleUrl)]);
+      const modules = await Promise.all([
+        import(configModuleUrl),
+        import(regionResolverModuleUrl),
+        import(geminiRateGuardModuleUrl),
+      ]);
       const configModule = modules[0];
       regionResolver = modules[1];
+      geminiRateLimits = modules[2].BROWSER_GEMINI_LIMITS;
+      geminiRateGuard = modules[2].createBrowserGeminiRateGuard();
       const config = configModule.firebaseConfig;
       const appSdk = await import("https://www.gstatic.com/firebasejs/" + SDK_VERSION + "/firebase-app.js");
       authSdk = await import("https://www.gstatic.com/firebasejs/" + SDK_VERSION + "/firebase-auth.js");
@@ -323,9 +332,11 @@
   }
 
   async function mapSearchWithGemini(query, resolver) {
+    await ready;
+    if (!geminiRateGuard || !geminiRateLimits) {
+      throw makeError("Gemini 무료 한도 보호 기능을 초기화하지 못했습니다.", 503, "gemini_rate_guard_unavailable");
+    }
     const runtime = await getGeminiRuntime();
-    const controller = new AbortController();
-    const timeoutId = setTimeout(function () { controller.abort(); }, 15000);
     const endpoint = "https://generativelanguage.googleapis.com/v1beta/models/" +
       encodeURIComponent(runtime.model) + ":generateContent";
     const requestBody = {
@@ -345,7 +356,7 @@
       }],
       generationConfig: {
         temperature: 0,
-        maxOutputTokens: 256,
+        maxOutputTokens: geminiRateLimits.maxOutputTokens,
         responseMimeType: "application/json",
         responseJsonSchema: {
           type: "object",
@@ -361,6 +372,15 @@
         },
       },
     };
+    const serializedBody = JSON.stringify(requestBody);
+    const estimatedInputTokens = new TextEncoder().encode(serializedBody).length;
+    await geminiRateGuard.reserve({
+      estimatedInputTokens: estimatedInputTokens,
+      maxOutputTokens: geminiRateLimits.maxOutputTokens,
+    });
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(function () { controller.abort(); }, 15000);
 
     let response;
     try {
@@ -370,7 +390,7 @@
           "Content-Type": "application/json",
           "x-goog-api-key": runtime.apiKey,
         },
-        body: JSON.stringify(requestBody),
+        body: serializedBody,
         signal: controller.signal,
       });
     } catch (error) {

@@ -48,6 +48,7 @@ DiDim/
 │  ├─ js/api.js                    # Auth·Firestore·Gemini REST API 연동
 │  ├─ js/search-resolver.js        # 표준 키워드 직접 판정과 응답 검증
 │  ├─ js/region-resolver.mjs       # 지역 정규화와 누락 지역 보완
+│  ├─ js/gemini-rate-guard.mjs     # 무료 Gemini 호출 한도 보호
 │  ├─ js/firebase-config.js        # 공개 Firebase 설정
 │  ├─ js/gemini-runtime-config.example.js # 배포 생성 파일 형식 예시
 │  └─ *.html
@@ -153,6 +154,17 @@ GEMINI_MODEL=gemini-3.1-flash-lite
 3. 검색어를 100자로 제한하고, 같은 브라우저의 동일 검색어는 캐시하여 중복 호출을 줄입니다.
 4. Gemini 응답은 최대 12개의 표준 키워드만 허용하는 JSON 스키마와 브라우저 검증을 모두 통과해야 사용합니다.
 
+무료 등급 보호값은 다음과 같습니다.
+
+- 프로젝트 최종 한도: `1 RPM`, `250K TPM`, `500 RPD` — Gemini API가 초과 요청을 차단합니다.
+- 브라우저 내부 한도: 탭 간 공유 `1 RPM`, `250K TPM`, `400 RPD`.
+- 수집기 내부 한도: Firestore 트랜잭션으로 공유하는 `1 RPM`, `80 RPD`.
+- 브라우저 1대와 수집기를 합쳐 최대 `480 RPD`로 20회 안전 여유를 둡니다.
+- 브라우저의 한도 잠금 또는 저장 기능을 사용할 수 없으면 미등록 검색어의 Gemini 호출을 허용하지 않습니다.
+- RPD 카운터는 Gemini 공식 초기화 기준인 미국 태평양 시간 자정에 맞춰 갱신합니다.
+
+여러 기기·브라우저의 직접 호출을 클라이언트 코드만으로 하나의 전역 카운터에 묶을 수는 없습니다. 이 경우에도 Gemini API의 프로젝트 무료 할당량이 최종 차단선으로 작동하며, 초과 요청은 `429`로 거절됩니다.
+
 Firebase App Check는 Firebase AI Logic 프록시를 사용할 때 적용할 수 있는 보호이므로, Gemini REST API를 직접 호출하는 현재 방식에는 적용되지 않습니다.
 
 ## 자동화
@@ -184,6 +196,7 @@ GitHub Actions의 `Run workflow`에서 `seed_only`를 선택하면 외부 사이
 npm run search-taxonomy:check
 node --test tests\search-resolver.test.js
 node --test tests\region-resolver.test.mjs
+node --test tests\gemini-rate-guard.test.mjs
 node --check public\js\api.js
 node --check public\js\search-resolver.js
 node --check public\js\firebase-config.js
@@ -206,6 +219,7 @@ npm run firebase:deploy
 - Gemini 키의 원본은 GitHub Secrets 또는 로컬 `.env`에만 저장하며 Git에는 커밋하지 않습니다.
 - 배포된 `gemini-runtime-config.js`의 키는 브라우저에서 노출됩니다. 클라이언트 암호화는 브라우저가 복호화해야 하므로 실질적인 보호가 되지 않습니다.
 - 기존 키 하나를 브라우저와 GitHub Actions가 공유하므로 HTTP 리퍼러 제한은 사용할 수 없습니다. API 제한과 할당량을 반드시 적용합니다.
+- 브라우저 검색과 수집기는 각각 보수적인 RPM·TPM·RPD 보호를 적용하며 초과 시 호출 전에 차단합니다.
 - Gemini가 반환한 값은 표준 키워드 목록으로 다시 검증합니다.
 - 서비스 계정 JSON, `.env`, 생성된 Gemini 런타임 설정, SQLite 파일은 `.gitignore`에서 제외합니다.
 - Firestore 접근 권한은 웹 API 키가 아니라 Authentication과 Security Rules로 통제합니다.

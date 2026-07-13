@@ -266,9 +266,9 @@ class FirebaseService:
     ) -> tuple[bool, str, int, int]:
         if not self.enabled or self._db is None:
             raise RuntimeError("Firestore is not configured.")
-        kst_date = now.astimezone(ZoneInfo("Asia/Seoul")).date().isoformat()
+        quota_date = now.astimezone(ZoneInfo("America/Los_Angeles")).date().isoformat()
         epoch = now.timestamp()
-        reference = self._db.collection("gemini_usage").document(kst_date)
+        reference = self._db.collection("gemini_usage").document(quota_date)
         transaction = self._db.transaction()
 
         @firestore.transactional
@@ -291,7 +291,7 @@ class FirebaseService:
             transaction.set(
                 reference,
                 {
-                    "date": kst_date,
+                    "date": quota_date,
                     "day_count": day_count + 1,
                     "recent_calls": recent_calls,
                     "purposes": purposes,

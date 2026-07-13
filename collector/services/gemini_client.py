@@ -33,7 +33,9 @@ class GeminiResponseError(GeminiError):
 
 
 class GeminiClient:
-    MAX_PROMPT_CHARS = 60_000
+    MAX_PROMPT_CHARS = 40_000
+    MAX_PROMPT_BYTES = 180_000
+    MAX_OUTPUT_TOKENS = 4_096
 
     def __init__(
         self,
@@ -68,7 +70,7 @@ class GeminiClient:
         if not self.enabled:
             raise GeminiConfigurationError("Gemini is not configured.")
 
-        bounded_prompt = str(prompt or "")[: self.MAX_PROMPT_CHARS]
+        bounded_prompt = self._bounded_prompt(prompt)
         last_error: Exception | None = None
         for attempt in range(self.max_attempts):
             decision = self.rate_limiter.reserve(purpose)
@@ -81,6 +83,7 @@ class GeminiClient:
                     config=types.GenerateContentConfig(
                         response_mime_type="application/json",
                         temperature=0.0,
+                        max_output_tokens=self.MAX_OUTPUT_TOKENS,
                     ),
                 )
                 text = getattr(response, "text", "") or ""
@@ -100,6 +103,12 @@ class GeminiClient:
                     time.sleep(0.25 * (attempt + 1))
 
         raise GeminiError(f"Gemini request failed after {self.max_attempts} attempts") from last_error
+
+    @classmethod
+    def _bounded_prompt(cls, prompt: str) -> str:
+        value = str(prompt or "")[: cls.MAX_PROMPT_CHARS]
+        encoded = value.encode("utf-8")[: cls.MAX_PROMPT_BYTES]
+        return encoded.decode("utf-8", errors="ignore")
 
     @classmethod
     def parse_json_payload(cls, text: str) -> Any:
@@ -124,4 +133,3 @@ class GeminiClient:
         array_end = text.rfind("]")
         if array_start >= 0 and array_end > array_start:
             yield text[array_start : array_end + 1]
-

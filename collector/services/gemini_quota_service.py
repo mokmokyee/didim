@@ -11,7 +11,7 @@ from zoneinfo import ZoneInfo
 
 
 logger = logging.getLogger(__name__)
-KST = ZoneInfo("Asia/Seoul")
+PACIFIC = ZoneInfo("America/Los_Angeles")
 
 
 class CentralQuotaBackend(Protocol):
@@ -36,10 +36,11 @@ class QuotaDecision:
 
 
 class GeminiRateLimiter:
-    OFFICIAL_RPM = 15
+    OFFICIAL_RPM = 1
+    OFFICIAL_TPM = 250_000
     OFFICIAL_RPD = 500
-    DEFAULT_INTERNAL_RPM = 14
-    DEFAULT_INTERNAL_RPD = 480
+    DEFAULT_INTERNAL_RPM = 1
+    DEFAULT_INTERNAL_RPD = 80
 
     def __init__(
         self,
@@ -50,10 +51,10 @@ class GeminiRateLimiter:
         now_func: Callable[[], datetime] | None = None,
         central_backend: CentralQuotaBackend | None = None,
     ):
-        if rpm_limit >= self.OFFICIAL_RPM or rpm_limit <= 0:
-            raise ValueError("Internal Gemini RPM limit must be between 1 and 14.")
-        if rpd_limit >= self.OFFICIAL_RPD or rpd_limit <= 0:
-            raise ValueError("Internal Gemini RPD limit must be between 1 and 499.")
+        if rpm_limit > self.OFFICIAL_RPM or rpm_limit <= 0:
+            raise ValueError("Internal Gemini RPM limit must not exceed 1.")
+        if rpd_limit > self.OFFICIAL_RPD or rpd_limit <= 0:
+            raise ValueError("Internal Gemini RPD limit must not exceed 500.")
         self.database_path = Path(database_path)
         self.rpm_limit = int(rpm_limit)
         self.rpd_limit = int(rpd_limit)
@@ -112,7 +113,7 @@ class GeminiRateLimiter:
     def _reserve_sqlite(self, purpose: str, now: datetime) -> QuotaDecision:
         epoch = now.timestamp()
         minute_start = epoch - 60.0
-        kst_date = now.astimezone(KST).date().isoformat()
+        quota_date = now.astimezone(PACIFIC).date().isoformat()
         connection = self._connect()
         try:
             connection.execute("BEGIN IMMEDIATE")
@@ -125,7 +126,7 @@ class GeminiRateLimiter:
             day_count = int(
                 connection.execute(
                     "SELECT COUNT(*) FROM gemini_calls WHERE kst_date = ?",
-                    (kst_date,),
+                    (quota_date,),
                 ).fetchone()[0]
             )
             if minute_count >= self.rpm_limit:
@@ -137,7 +138,7 @@ class GeminiRateLimiter:
 
             connection.execute(
                 "INSERT INTO gemini_calls(reserved_at_utc, kst_date, purpose) VALUES (?, ?, ?)",
-                (epoch, kst_date, purpose),
+                (epoch, quota_date, purpose),
             )
             connection.execute(
                 "DELETE FROM gemini_calls WHERE reserved_at_utc < ?",
@@ -158,7 +159,7 @@ class GeminiRateLimiter:
     def stats(self, now: datetime | None = None) -> dict[str, object]:
         current = self._ensure_aware(now or self._aware_now())
         epoch = current.timestamp()
-        kst_date = current.astimezone(KST).date().isoformat()
+        quota_date = current.astimezone(PACIFIC).date().isoformat()
         with self._connect() as connection:
             minute_count = int(
                 connection.execute(
@@ -169,18 +170,18 @@ class GeminiRateLimiter:
             day_count = int(
                 connection.execute(
                     "SELECT COUNT(*) FROM gemini_calls WHERE kst_date = ?",
-                    (kst_date,),
+                    (quota_date,),
                 ).fetchone()[0]
             )
             purposes = {
                 row[0]: int(row[1])
                 for row in connection.execute(
                     "SELECT purpose, COUNT(*) FROM gemini_calls WHERE kst_date = ? GROUP BY purpose",
-                    (kst_date,),
+                    (quota_date,),
                 ).fetchall()
             }
         return {
-            "kst_date": kst_date,
+            "quota_date": quota_date,
             "minute_count": minute_count,
             "day_count": day_count,
             "rpm_limit": self.rpm_limit,
@@ -214,4 +215,3 @@ class GeminiRateLimiter:
                 decision.minute_count,
                 decision.day_count,
             )
-
