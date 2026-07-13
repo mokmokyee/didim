@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "keywords": [
     {"id": "education", "label": "교육", "aliases": ["학습", "강의", "교육과정", "배움"], "group": "교육"},
     {"id": "career", "label": "진로", "aliases": ["취업", "직업", "커리어", "진학"], "group": "교육"},
@@ -7,9 +7,9 @@
     {"id": "scholarship", "label": "장학", "aliases": ["장학금", "학비", "등록금", "학자금"], "group": "교육"},
     {"id": "science", "label": "과학", "aliases": ["자연과학", "과학기술", "연구"], "group": "과학기술"},
     {"id": "engineering", "label": "공학", "aliases": ["엔지니어링", "기술", "이공계"], "group": "과학기술"},
-    {"id": "software", "label": "소프트웨어", "aliases": ["개발", "프로그래밍", "코딩", "IT", "앱", "웹"], "group": "과학기술"},
+    {"id": "software", "label": "소프트웨어", "aliases": ["개발", "프로그래밍", "코딩", "IT", "앱", "웹", "컴퓨터과학", "전산학"], "group": "과학기술"},
     {"id": "ai", "label": "인공지능", "aliases": ["AI", "머신러닝", "딥러닝", "생성형AI"], "group": "과학기술"},
-    {"id": "data", "label": "데이터", "aliases": ["빅데이터", "데이터분석", "통계", "데이터시각화"], "group": "과학기술"},
+    {"id": "data", "label": "데이터", "aliases": ["빅데이터", "데이터분석", "통계", "데이터시각화", "데이터사이언스", "데이터과학"], "group": "과학기술"},
     {"id": "security", "label": "정보보안", "aliases": ["보안", "사이버보안", "해킹", "개인정보보호"], "group": "과학기술"},
     {"id": "robot", "label": "로봇", "aliases": ["로보틱스", "드론", "자율주행"], "group": "과학기술"},
     {"id": "game", "label": "게임", "aliases": ["게임개발", "e스포츠", "게이미피케이션"], "group": "콘텐츠"},

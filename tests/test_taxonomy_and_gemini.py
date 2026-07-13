@@ -138,3 +138,21 @@ def test_local_alias_search_fallback(taxonomy):
     mapping = service.map_search_query("그림")
     assert "미술" in mapping["keywords"]
     assert mapping["source"] == "local"
+
+
+def test_exact_standard_search_does_not_call_gemini(taxonomy):
+    client = BatchClient()
+    service = GeminiService(client, taxonomy, MemoryCache())
+    mapping = service.map_search_query("컴퓨터 과학")
+    assert mapping["keywords"] == ["소프트웨어"]
+    assert mapping["source"] == "local"
+    assert "search_keyword_mapping" not in client.calls
+
+
+def test_unknown_search_uses_gemini_and_validates_keywords(taxonomy):
+    client = BatchClient()
+    service = GeminiService(client, taxonomy, MemoryCache())
+    mapping = service.map_search_query("디지털 미래 설계")
+    assert mapping["keywords"] == ["미술", "그래픽디자인"]
+    assert mapping["source"] == "gemini"
+    assert client.calls.count("search_keyword_mapping") == 1

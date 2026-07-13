@@ -2,7 +2,10 @@
   "private": true,
   "scripts": {
     "firebase:serve": "firebase emulators:start --only hosting",
-    "firebase:deploy": "firebase deploy --only hosting,firestore:rules,firestore:indexes"
+    "firebase:deploy": "firebase deploy --only hosting,firestore:rules,firestore:indexes",
+    "gemini-runtime:write": "node scripts/write-gemini-runtime-config.mjs",
+    "search-taxonomy:sync": "node scripts/sync-search-taxonomy.mjs",
+    "search-taxonomy:check": "node scripts/sync-search-taxonomy.mjs --check"
   },
   "devDependencies": {
     "firebase-tools": "^15.23.0"

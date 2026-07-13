@@ -64,12 +64,16 @@ class TaxonomyService:
         self.region_set = set(self.regions)
 
         self._terms: list[tuple[str, str, int]] = []
+        self._exact_terms: dict[str, list[str]] = {}
         for keyword in self.keywords:
             label = str(keyword["label"])
             for term in [label, *keyword.get("aliases", [])]:
                 normalized = normalize_lookup(term)
                 if normalized:
                     self._terms.append((normalized, label, len(normalized)))
+                    labels = self._exact_terms.setdefault(normalized, [])
+                    if label not in labels:
+                        labels.append(label)
         self._terms.sort(key=lambda row: row[2], reverse=True)
 
     def _load_json(self, filename: str) -> dict[str, Any]:
@@ -105,6 +109,11 @@ class TaxonomyService:
                 if keyword not in result:
                     result.append(keyword)
         return result
+
+    def exact_match(self, value: Any, max_count: int = MAX_KEYWORDS) -> list[str]:
+        """Return canonical labels only when the full normalized term is registered."""
+        normalized = normalize_lookup(value)
+        return list(self._exact_terms.get(normalized, []))[:max_count]
 
     def local_match(self, values: Iterable[Any], max_count: int = MAX_KEYWORDS) -> list[str]:
         result: list[str] = []
@@ -175,4 +184,3 @@ class TaxonomyService:
             if region != "전국" and normalize_lookup(region) in normalized and region not in found:
                 found.append(region)
         return found
-

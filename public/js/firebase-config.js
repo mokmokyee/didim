@@ -7,3 +7,5 @@ export const firebaseConfig = Object.freeze({
   appId: "1:57938841494:web:ef58994ea123bf0fa957b7",
   measurementId: "G-K19LE09CKG",
 });
+
+export const geminiModel = "gemini-3.1-flash-lite";

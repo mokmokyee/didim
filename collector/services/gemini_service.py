@@ -129,9 +129,9 @@ class GeminiService:
                 "source": "cache",
             }
 
-        keywords = self.taxonomy.local_match([original], max_count=12)
+        keywords = self.taxonomy.exact_match(original, max_count=12)
         source = "local"
-        if original and self.client.enabled:
+        if original and not keywords and self.client.enabled:
             try:
                 parsed = self.client.generate_json(
                     purpose="search_keyword_mapping",

@@ -6,6 +6,7 @@
 .venv/
 venv/
 node_modules/
+public/js/gemini-runtime-config.js
 __pycache__/
 **/__pycache__/
 *.py[cod]
