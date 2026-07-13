@@ -18,6 +18,7 @@ from .opportunity_utils import (
     clean_text,
     dedupe_items,
     extract_dates,
+    infer_targets,
     is_http_url,
     is_safe_crawl_url,
     stable_id,
@@ -470,7 +471,7 @@ class CrawlerService:
         if end_date:
             enriched["end_date"] = end_date
         targets = self._infer_targets(" ".join([page_text, str(values.get("eligibility") or "")]))
-        if targets:
+        if targets != ["전 연령"] or not enriched.get("targets"):
             enriched["targets"] = targets
         enriched["detail_url"] = response.url
         enriched["canonical_detail_url"] = canonical_url(response.url)
@@ -524,13 +525,7 @@ class CrawlerService:
 
     @staticmethod
     def _infer_targets(text: str) -> list[str]:
-        normalized = clean_text(text)
-        targets: list[str] = []
-        if re.search(r"고등학생|고교생|고등학교|청소년", normalized):
-            targets.append("고등학생")
-        if re.search(r"대학생|대학교|대학원생|재학생", normalized):
-            targets.append("대학생")
-        return targets
+        return infer_targets(text)
 
     def _ancestor_text(self, anchor: Tag, names: list[str]) -> str:
         for name in names:

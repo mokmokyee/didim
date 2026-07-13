@@ -46,6 +46,22 @@ def test_region_filter_includes_online_hybrid_and_selected_offline(storage, taxo
     assert {item["id"] for item in unselected} == {"online", "hybrid", "seoul", "busan", "nationwide"}
 
 
+def test_student_filter_includes_selected_target_and_all_ages(storage, taxonomy):
+    all_ages = opportunity("all-ages")
+    high = opportunity("high", targets=["고등학생"])
+    college = opportunity("college", targets=["대학생"])
+    inferred_college = opportunity("inferred-college")
+    inferred_college["eligibility"] = "대학생만 지원할 수 있습니다."
+    storage.upsert_opportunities([all_ages, high, college, inferred_college])
+
+    service = service_for(storage, taxonomy)
+    high_items = service.list_opportunities(targets=["고등학생"], page_size=100)["items"]
+    college_items = service.list_opportunities(targets=["대학생"], page_size=100)["items"]
+
+    assert {item["id"] for item in high_items} == {"all-ages", "high"}
+    assert {item["id"] for item in college_items} == {"all-ages", "college", "inferred-college"}
+
+
 def test_ui_filter_uses_mapped_internal_keywords(storage, taxonomy):
     storage.upsert_opportunities(
         [

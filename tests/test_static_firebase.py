@@ -42,6 +42,15 @@ def test_region_resolver_is_loaded_by_the_firebase_adapter():
     assert '"전국"' in resolver
 
 
+def test_target_resolver_is_loaded_by_the_firebase_adapter():
+    adapter = (ROOT / "public" / "js" / "api.js").read_text(encoding="utf-8")
+    resolver = (ROOT / "public" / "js" / "target-resolver.mjs").read_text(encoding="utf-8")
+    assert "target-resolver.mjs" in adapter
+    assert "resolveOpportunityTargets" in adapter
+    assert "matchesSelectedTargets" in adapter
+    assert '"전 연령"' in resolver
+
+
 def test_service_credentials_are_ignored():
     ignored = (ROOT / ".gitignore").read_text(encoding="utf-8")
     assert "firebase-service-account*.json" in ignored

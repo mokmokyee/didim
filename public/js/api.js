@@ -12,6 +12,7 @@
   const configModuleUrl = new URL("firebase-config.js", scriptBase).href;
   const geminiRuntimeConfigUrl = new URL("gemini-runtime-config.js", scriptBase).href;
   const regionResolverModuleUrl = new URL("region-resolver.mjs?v=20260714-1", scriptBase).href;
+  const targetResolverModuleUrl = new URL("target-resolver.mjs?v=20260714-1", scriptBase).href;
   const geminiRateGuardModuleUrl = new URL("gemini-rate-guard.mjs?v=20260714-2", scriptBase).href;
 
   const TYPE_ALIASES = {
@@ -50,6 +51,7 @@
   let authReady = Promise.resolve(null);
   let firebaseEnabled = false;
   let regionResolver = null;
+  let targetResolver = null;
   let geminiRateGuard = null;
   let geminiRateLimits = null;
   let opportunityCache = null;
@@ -70,12 +72,14 @@
       const modules = await Promise.all([
         import(configModuleUrl),
         import(regionResolverModuleUrl),
+        import(targetResolverModuleUrl),
         import(geminiRateGuardModuleUrl),
       ]);
       const configModule = modules[0];
       regionResolver = modules[1];
-      geminiRateLimits = modules[2].BROWSER_GEMINI_LIMITS;
-      geminiRateGuard = modules[2].createBrowserGeminiRateGuard();
+      targetResolver = modules[2];
+      geminiRateLimits = modules[3].BROWSER_GEMINI_LIMITS;
+      geminiRateGuard = modules[3].createBrowserGeminiRateGuard();
       const config = configModule.firebaseConfig;
       const appSdk = await import("https://www.gstatic.com/firebasejs/" + SDK_VERSION + "/firebase-app.js");
       authSdk = await import("https://www.gstatic.com/firebasejs/" + SDK_VERSION + "/firebase-auth.js");
@@ -164,7 +168,10 @@
   function mapOpportunity(item) {
     if (!item || item.id === undefined || item.id === null) return null;
     const keywords = unique(asArray(item.keywords).concat(asArray(item.category)));
-    const targets = unique(asArray(item.targets || item.target));
+    const targetResolution = targetResolver
+      ? targetResolver.resolveOpportunityTargets(item)
+      : { targets: unique(asArray(item.targets || item.target)).concat(["전 연령"]).slice(0, 1) };
+    const targets = unique(targetResolution.targets);
     const regionResolution = regionResolver
       ? regionResolver.resolveOpportunityRegion(item)
       : { mode: item.participation_mode || item.method || "unknown", regions: unique(asArray(item.regions || item.region)) };
@@ -187,7 +194,7 @@
       thumbnail: item.thumbnail || null,
       summary: item.program_introduction || item.summary || item.description || "",
       description: item.program_introduction || item.description || item.summary || "",
-      target: firstText(targets),
+      target: targets.join(", "),
       ageRequirement: item.age_requirement || item.ageRequirement || "",
       category: keywords,
       method: displayMode(mode),
@@ -478,7 +485,7 @@
       if (status !== "any" && status !== "closed" && item.status === "closed") return false;
       if (status === "closed" && item.status !== "closed") return false;
       if (types.size && !types.has(item.type)) return false;
-      if (targets.size && !item._targets.some(function (target) { return targets.has(target); })) return false;
+      if (targets.size && !targetResolver.matchesSelectedTargets(item._targets, Array.from(targets))) return false;
       if (!matchesCategory(item, categories)) return false;
       if (!matchesRegion(item, regions)) return false;
       return matchesResolvedSearch(item, searchResolution);
@@ -693,7 +700,7 @@
         score += savedOverlap.length * 6;
         reasons.push("저장한 프로그램과 비슷한 분야");
       }
-      if (userType && item._targets.includes(userType)) {
+      if (userType && targetResolver.matchesSelectedTargets(item._targets, [userType])) {
         score += 15;
         reasons.push("모집 대상");
       }

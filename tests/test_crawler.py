@@ -61,6 +61,23 @@ def test_detail_crawl_collects_real_optional_fields(monkeypatch):
     assert enriched["required_documents"] == "지원서"
     assert enriched["benefits"] == "장학금 100만원"
     assert enriched["contact"] == "help@example.org"
+    assert enriched["targets"] == ["대학생"]
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("참가 자격 정보 없음", ["전 연령"]),
+        ("전국 고등학생 참가 가능", ["고등학생"]),
+        ("대학생 서포터즈 모집", ["대학생"]),
+        ("고등학생 및 대학생 대상", ["고등학생", "대학생"]),
+        ("청소년 프로그램", ["전 연령"]),
+        ("대학원생 연구 지원", ["전 연령"]),
+        ("누구나 참여 가능", ["전 연령"]),
+    ],
+)
+def test_target_inference_requires_explicit_student_type(text, expected):
+    assert CrawlerService._infer_targets(text) == expected
 
 
 @pytest.mark.parametrize("placeholder", ["데이터 없음", "정보 없음", "N/A", "해당 없음", "-"])

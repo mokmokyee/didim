@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any, Iterable
 
 from .gemini_service import GeminiService
+from .opportunity_utils import targets_match
 from .storage_service import StorageService
 from .taxonomy_service import TaxonomyService, normalize_text
 
@@ -133,10 +134,7 @@ class OpportunityService:
             if saved_overlap:
                 score += len(saved_overlap) * 6
                 reasons.append("저장한 프로그램과 비슷한 분야")
-            targets = item.get("targets") or item.get("target") or []
-            if isinstance(targets, str):
-                targets = [targets]
-            if user_type and user_type in targets:
+            if user_type and targets_match(item, [user_type]):
                 score += 15
                 reasons.append("모집 대상")
             if preferred_types and item.get("type") in preferred_types:

@@ -11,6 +11,7 @@ from typing import Any, Iterable
 from zoneinfo import ZoneInfo
 
 from .firebase_service import FirebaseService
+from .opportunity_utils import targets_match
 
 
 logger = logging.getLogger(__name__)
@@ -301,10 +302,7 @@ class StorageService:
                 continue
             if type_filter and str(item.get("type")) not in type_filter:
                 continue
-            target_values = item.get("targets") or item.get("target") or []
-            if isinstance(target_values, str):
-                target_values = [target_values]
-            if target_filter and not target_filter.intersection(str(value) for value in target_values):
+            if target_filter and not targets_match(item, target_filter):
                 continue
             item_keywords = {str(value) for value in item.get("keywords", [])}
             if keyword_filter and not keyword_filter.intersection(item_keywords):

@@ -6,7 +6,7 @@ import re
 from pathlib import Path
 from typing import Any
 
-from .opportunity_utils import is_http_url
+from .opportunity_utils import is_http_url, resolve_opportunity_targets
 from .storage_service import StorageService
 from .taxonomy_service import TaxonomyService, opportunity_content_hash
 
@@ -77,6 +77,7 @@ def import_legacy_crawl_cache_if_empty(
             "gemini_status": "local",
         }
         item.update(taxonomy.classify_local(item))
+        item["targets"] = resolve_opportunity_targets(item)
         item["content_hash"] = opportunity_content_hash(item)
         imported.append(item)
     if not imported:

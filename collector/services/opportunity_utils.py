@@ -18,9 +18,80 @@ TRACKING_PARAMS = {
     "gclid",
 }
 
+ALL_AGES_TARGET = "전 연령"
+HIGH_SCHOOL_TARGET = "고등학생"
+COLLEGE_TARGET = "대학생"
+
+TARGET_TEXT_FIELDS = (
+    "title",
+    "raw_title",
+    "category",
+    "program_introduction",
+    "summary",
+    "description",
+    "activity_content",
+    "eligibility",
+    "requirements",
+    "age_requirement",
+    "raw_text",
+)
+
 
 def clean_text(value: Any) -> str:
     return re.sub(r"\s+", " ", str(value or "").replace("\xa0", " ")).strip()
+
+
+def infer_targets(text: Any) -> list[str]:
+    normalized = clean_text(text)
+    if re.search(r"누구나|전\s*연령|연령\s*(?:무관|제한\s*없음)|나이\s*무관", normalized):
+        return [ALL_AGES_TARGET]
+
+    targets: list[str] = []
+    if re.search(r"고등학생|고교생|고등학교\s*(?:학생|재학생)", normalized):
+        targets.append(HIGH_SCHOOL_TARGET)
+    if re.search(r"대학생|학부생|전문대생|대학(?:교)?\s*재학생", normalized):
+        targets.append(COLLEGE_TARGET)
+    return targets or [ALL_AGES_TARGET]
+
+
+def normalize_targets(values: Any) -> list[str]:
+    if isinstance(values, str):
+        values = [values]
+    aliases = {
+        "전연령": ALL_AGES_TARGET,
+        "누구나": ALL_AGES_TARGET,
+        "연령무관": ALL_AGES_TARGET,
+        "나이무관": ALL_AGES_TARGET,
+        "연령제한없음": ALL_AGES_TARGET,
+        "고등학생": HIGH_SCHOOL_TARGET,
+        "고교생": HIGH_SCHOOL_TARGET,
+        "대학생": COLLEGE_TARGET,
+        "학부생": COLLEGE_TARGET,
+        "전문대생": COLLEGE_TARGET,
+    }
+    result: list[str] = []
+    for raw in values or []:
+        lookup = re.sub(r"[\s·._\-/]+", "", clean_text(raw)).casefold()
+        target = aliases.get(lookup)
+        if target and target not in result:
+            result.append(target)
+    return [ALL_AGES_TARGET] if ALL_AGES_TARGET in result else result
+
+
+def resolve_opportunity_targets(item: dict[str, Any]) -> list[str]:
+    explicit = normalize_targets(item.get("targets") or item.get("target") or [])
+    if explicit:
+        return explicit
+    text = " ".join(clean_text(item.get(field)) for field in TARGET_TEXT_FIELDS)
+    return infer_targets(text)
+
+
+def targets_match(item: dict[str, Any], selected_targets: Any) -> bool:
+    selected = [target for target in normalize_targets(selected_targets) if target != ALL_AGES_TARGET]
+    if not selected:
+        return True
+    available = resolve_opportunity_targets(item)
+    return ALL_AGES_TARGET in available or bool(set(selected).intersection(available))
 
 
 def is_http_url(value: str) -> bool:
