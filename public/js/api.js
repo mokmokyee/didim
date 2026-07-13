@@ -12,7 +12,7 @@
   const configModuleUrl = new URL("firebase-config.js", scriptBase).href;
   const geminiRuntimeConfigUrl = new URL("gemini-runtime-config.js", scriptBase).href;
   const regionResolverModuleUrl = new URL("region-resolver.mjs?v=20260714-1", scriptBase).href;
-  const geminiRateGuardModuleUrl = new URL("gemini-rate-guard.mjs?v=20260714-1", scriptBase).href;
+  const geminiRateGuardModuleUrl = new URL("gemini-rate-guard.mjs?v=20260714-2", scriptBase).href;
 
   const TYPE_ALIASES = {
     contest: "공모전",

@@ -72,6 +72,12 @@ def test_limits_above_free_tier_are_rejected(tmp_path):
         GeminiRateLimiter(tmp_path / "rpd.sqlite3", rpm_limit=1, rpd_limit=501)
 
 
+def test_project_rpm_keeps_one_request_of_headroom():
+    assert GeminiRateLimiter.OFFICIAL_RPM == 15
+    assert 13 + GeminiRateLimiter.COLLECTOR_RPM_BUDGET == 14
+    assert 14 < GeminiRateLimiter.OFFICIAL_RPM
+
+
 def test_prompt_and_output_are_bounded_below_tpm_limit(tmp_path):
     limiter = GeminiRateLimiter(tmp_path / "quota.sqlite3", rpm_limit=1, rpd_limit=80)
     client = GeminiClient("test-key", "test-model", limiter, max_attempts=1)

@@ -62,6 +62,7 @@ def test_browser_gemini_calls_use_the_free_tier_guard():
     guard = (ROOT / "public" / "js" / "gemini-rate-guard.mjs").read_text(encoding="utf-8")
     assert "gemini-rate-guard.mjs" in adapter
     assert "geminiRateGuard.reserve" in adapter
-    assert "minimumIntervalMs: 61000" in guard
+    assert "rpm: 13" in guard
+    assert "minimumIntervalMs: 4700" in guard
     assert "tpm: 250000" in guard
     assert "rpd: 400" in guard

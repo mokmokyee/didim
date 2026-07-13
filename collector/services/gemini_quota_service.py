@@ -36,9 +36,10 @@ class QuotaDecision:
 
 
 class GeminiRateLimiter:
-    OFFICIAL_RPM = 1
+    OFFICIAL_RPM = 15
     OFFICIAL_TPM = 250_000
     OFFICIAL_RPD = 500
+    COLLECTOR_RPM_BUDGET = 1
     DEFAULT_INTERNAL_RPM = 1
     DEFAULT_INTERNAL_RPD = 80
 
@@ -51,8 +52,8 @@ class GeminiRateLimiter:
         now_func: Callable[[], datetime] | None = None,
         central_backend: CentralQuotaBackend | None = None,
     ):
-        if rpm_limit > self.OFFICIAL_RPM or rpm_limit <= 0:
-            raise ValueError("Internal Gemini RPM limit must not exceed 1.")
+        if rpm_limit > self.COLLECTOR_RPM_BUDGET or rpm_limit <= 0:
+            raise ValueError("Collector Gemini RPM limit must not exceed its 1 RPM project budget.")
         if rpd_limit > self.OFFICIAL_RPD or rpd_limit <= 0:
             raise ValueError("Internal Gemini RPD limit must not exceed 500.")
         self.database_path = Path(database_path)

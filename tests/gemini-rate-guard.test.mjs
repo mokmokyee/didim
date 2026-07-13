@@ -15,13 +15,14 @@ const locks = {
   request: async (_name, _options, callback) => callback(),
 };
 
-test("브라우저 Gemini 제한은 무료 등급보다 보수적이다", () => {
-  assert.equal(BROWSER_GEMINI_LIMITS.rpm, 1);
+test("브라우저 Gemini 제한은 프로젝트 안전 예산을 지킨다", () => {
+  assert.equal(BROWSER_GEMINI_LIMITS.rpm, 13);
   assert.equal(BROWSER_GEMINI_LIMITS.tpm, 250000);
   assert.ok(BROWSER_GEMINI_LIMITS.rpd < 500);
+  assert.ok(BROWSER_GEMINI_LIMITS.minimumIntervalMs >= 4700);
 });
 
-test("두 번째 요청은 61초가 지나기 전에 차단한다", async () => {
+test("연속 요청은 4.7초가 지나기 전에 차단한다", async () => {
   let timestamp = Date.UTC(2026, 6, 14, 0, 0, 0);
   const guard = createBrowserGeminiRateGuard({
     storage: new MemoryStorage(),

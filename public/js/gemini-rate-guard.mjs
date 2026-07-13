@@ -1,13 +1,14 @@
-/* Conservative browser-side guard for the shared Gemini free-tier key. */
+/* Browser-side guard for the shared Gemini free-tier project. */
 export const BROWSER_GEMINI_LIMITS = Object.freeze({
-  rpm: 1,
+  rpm: 13,
   tpm: 250000,
   rpd: 400,
-  minimumIntervalMs: 61000,
+  // 13 calls spaced by 4.7 seconds stay below 13 calls in every rolling minute.
+  minimumIntervalMs: 4700,
   maxOutputTokens: 256,
 });
 
-const STORAGE_KEY = "didim:gemini-rate-guard:v1";
+const STORAGE_KEY = "didim:gemini-rate-guard:v2";
 const LOCK_NAME = "didim-gemini-rate-guard";
 
 function quotaError(message, code, status, retryAfterSeconds) {
@@ -75,7 +76,7 @@ export function createBrowserGeminiRateGuard(options = {}) {
       if (state.lastReservedAt && elapsed < BROWSER_GEMINI_LIMITS.minimumIntervalMs) {
         const waitSeconds = Math.ceil((BROWSER_GEMINI_LIMITS.minimumIntervalMs - elapsed) / 1000);
         throw quotaError(
-          "AI 검색은 무료 한도 보호를 위해 1분에 한 번만 사용할 수 있어요. " + waitSeconds + "초 후 다시 시도해 주세요.",
+          "AI 검색 요청이 한꺼번에 몰리지 않도록 잠시 제한하고 있어요. " + waitSeconds + "초 후 다시 시도해 주세요.",
           "gemini_rpm_guard",
           429,
           waitSeconds,
