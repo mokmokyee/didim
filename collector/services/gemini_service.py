@@ -39,7 +39,11 @@ class GeminiService:
             item = self._prepare_opportunity(raw)
             item_id = str(item.get("id", ""))
             existing = existing_by_id.get(item_id, {})
-            if existing and existing.get("content_hash") == item["content_hash"]:
+            classification_current = (
+                str(existing.get("classification_version") or "")
+                == str(self.taxonomy.CLASSIFICATION_VERSION)
+            )
+            if existing and existing.get("content_hash") == item["content_hash"] and classification_current:
                 item["keywords"] = self.taxonomy.validate_keywords(existing.get("keywords", []))
                 item["participation_mode"] = self._validate_mode(existing.get("participation_mode"))
                 item["regions"] = self.taxonomy.validate_regions(existing.get("regions", []))
@@ -177,6 +181,7 @@ class GeminiService:
         item["id"] = normalize_text(item.get("id"))
         item["content_hash"] = opportunity_content_hash(item)
         item["keyword_taxonomy_version"] = self.taxonomy.version
+        item["classification_version"] = self.taxonomy.CLASSIFICATION_VERSION
         item["source_active"] = bool(item.get("source_active", True))
         return item
 
@@ -189,6 +194,7 @@ class GeminiService:
         if not isinstance(parsed_items, list):
             return {}
         allowed_ids = {str(item["id"]) for item in batch}
+        fallback_by_id = {str(item["id"]): item for item in batch}
         result: dict[str, dict[str, Any]] = {}
         for raw in parsed_items:
             if not isinstance(raw, dict):
@@ -199,11 +205,17 @@ class GeminiService:
             mode = self._validate_mode(raw.get("participation_mode"))
             regions = self.taxonomy.validate_regions(raw.get("regions", []))
             if mode == "online":
-                regions = []
+                regions = ["전국"]
+            elif not regions:
+                fallback_item = fallback_by_id[item_id]
+                fallback_regions = self.taxonomy.validate_regions(fallback_item.get("regions", []))
+                if mode == "offline" and fallback_item.get("participation_mode") != "offline":
+                    fallback_regions = [region for region in fallback_regions if region != "전국"]
+                regions = fallback_regions
             result[item_id] = {
                 "keywords": self.taxonomy.validate_keywords(raw.get("keywords", [])),
                 "participation_mode": mode,
-                "regions": regions if mode in {"offline", "hybrid"} else [],
+                "regions": regions,
             }
         return result
 
@@ -228,7 +240,8 @@ class GeminiService:
             "한국 공모전·장학금 분류기다. 입력 사실만 사용하고 누락 정보를 만들지 마라. "
             "keywords는 allowed_keywords 안의 값만 항목당 최대 4개 반환한다. "
             "participation_mode는 online, offline, hybrid, unknown 중 하나다. "
-            "regions는 allowed_regions 안의 값만 사용하고 online이면 빈 배열이다. "
+            "regions는 allowed_regions 안의 값만 사용하고 online이면 전국이다. "
+            "지역 근거가 없지만 어디서나 참여할 수 있으면 전국으로 분류한다. "
             "입력에 있는 id만 한 번씩 반환한다. 설명과 Markdown 없이 JSON 객체만 반환한다.\n"
             "출력: {\"items\":[{\"id\":\"...\",\"keywords\":[\"...\"],"
             "\"participation_mode\":\"unknown\",\"regions\":[]}]}\n"

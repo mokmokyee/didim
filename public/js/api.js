@@ -11,6 +11,7 @@
   const searchTaxonomyUrl = new URL("../data/search_taxonomy.json", scriptBase).href;
   const configModuleUrl = new URL("firebase-config.js", scriptBase).href;
   const geminiRuntimeConfigUrl = new URL("gemini-runtime-config.js", scriptBase).href;
+  const regionResolverModuleUrl = new URL("region-resolver.mjs?v=20260714-1", scriptBase).href;
 
   const TYPE_ALIASES = {
     contest: "공모전",
@@ -47,6 +48,7 @@
   let firestoreSdk = null;
   let authReady = Promise.resolve(null);
   let firebaseEnabled = false;
+  let regionResolver = null;
   let opportunityCache = null;
   let configuredGeminiModel = "gemini-3.1-flash-lite";
   let searchResolverPromise = null;
@@ -62,7 +64,9 @@
 
   async function initialize() {
     try {
-      const configModule = await import(configModuleUrl);
+      const modules = await Promise.all([import(configModuleUrl), import(regionResolverModuleUrl)]);
+      const configModule = modules[0];
+      regionResolver = modules[1];
       const config = configModule.firebaseConfig;
       const appSdk = await import("https://www.gstatic.com/firebasejs/" + SDK_VERSION + "/firebase-app.js");
       authSdk = await import("https://www.gstatic.com/firebasejs/" + SDK_VERSION + "/firebase-auth.js");
@@ -152,7 +156,10 @@
     if (!item || item.id === undefined || item.id === null) return null;
     const keywords = unique(asArray(item.keywords).concat(asArray(item.category)));
     const targets = unique(asArray(item.targets || item.target));
-    const regions = unique(asArray(item.regions || item.region));
+    const regionResolution = regionResolver
+      ? regionResolver.resolveOpportunityRegion(item)
+      : { mode: item.participation_mode || item.method || "unknown", regions: unique(asArray(item.regions || item.region)) };
+    const regions = unique(regionResolution.regions);
     const endDate = dateOnly(item.end_date || item.recruitmentEndDate);
     const calculatedDDay = daysUntil(endDate);
     const dDay = calculatedDDay === null
@@ -162,7 +169,7 @@
     const status = !sourceActive || (dDay !== null && dDay < 0)
       ? "closed"
       : (dDay !== null && dDay <= 7 ? "urgent" : (item.status || "open"));
-    const mode = item.participation_mode || item.method || "unknown";
+    const mode = regionResolution.mode;
     return {
       id: String(item.id),
       title: item.title || "",

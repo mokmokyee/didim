@@ -353,11 +353,9 @@ class StorageService:
     def _matches_region(item: dict[str, Any], selected_regions: set[str]) -> bool:
         mode = str(item.get("participation_mode") or "unknown")
         regions = {str(value) for value in item.get("regions", [])}
-        if mode in {"online", "hybrid"}:
+        if mode in {"online", "hybrid"} or "전국" in regions:
             return True
-        if mode == "offline":
-            return bool(selected_regions.intersection(regions)) or "전국" in regions
-        return False
+        return bool(selected_regions.intersection(regions))
 
     @staticmethod
     def _sort(items: list[dict[str, Any]], sort: str) -> None:

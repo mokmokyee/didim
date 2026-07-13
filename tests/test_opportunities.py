@@ -36,13 +36,14 @@ def test_region_filter_includes_online_hybrid_and_selected_offline(storage, taxo
             opportunity("hybrid", mode="hybrid", regions=["부산"]),
             opportunity("seoul", mode="offline", regions=["서울"]),
             opportunity("busan", mode="offline", regions=["부산"]),
+            opportunity("nationwide", mode="unknown", regions=["전국"]),
         ]
     )
     service = service_for(storage, taxonomy)
     selected = service.list_opportunities(regions=["서울"], page_size=100)["items"]
-    assert {item["id"] for item in selected} == {"online", "hybrid", "seoul"}
+    assert {item["id"] for item in selected} == {"online", "hybrid", "seoul", "nationwide"}
     unselected = service.list_opportunities(page_size=100)["items"]
-    assert {item["id"] for item in unselected} == {"online", "hybrid", "seoul", "busan"}
+    assert {item["id"] for item in unselected} == {"online", "hybrid", "seoul", "busan", "nationwide"}
 
 
 def test_ui_filter_uses_mapped_internal_keywords(storage, taxonomy):

@@ -34,6 +34,14 @@ def test_search_taxonomy_and_browser_resolver_are_deployed():
     assert "js/search-resolver.js" in page
 
 
+def test_region_resolver_is_loaded_by_the_firebase_adapter():
+    adapter = (ROOT / "public" / "js" / "api.js").read_text(encoding="utf-8")
+    resolver = (ROOT / "public" / "js" / "region-resolver.mjs").read_text(encoding="utf-8")
+    assert "region-resolver.mjs" in adapter
+    assert "resolveOpportunityRegion" in adapter
+    assert '"전국"' in resolver
+
+
 def test_service_credentials_are_ignored():
     ignored = (ROOT / ".gitignore").read_text(encoding="utf-8")
     assert "firebase-service-account*.json" in ignored

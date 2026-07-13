@@ -102,6 +102,7 @@ def test_unchanged_hash_is_not_sent_again(taxonomy):
         "same": {
             **raw,
             "content_hash": opportunity_content_hash(raw),
+            "classification_version": taxonomy.CLASSIFICATION_VERSION,
             "keywords": ["미술"],
             "participation_mode": "online",
             "regions": [],
@@ -111,6 +112,35 @@ def test_unchanged_hash_is_not_sent_again(taxonomy):
     result = service.enrich_opportunities([raw], existing)
     assert result[0]["keywords"] == ["미술"]
     assert client.calls == []
+
+
+def test_stale_classification_is_rebuilt_even_when_content_is_unchanged(taxonomy):
+    client = BatchClient()
+    service = GeminiService(client, taxonomy, MemoryCache())
+    raw = raw_item("stale")
+    existing = {
+        "stale": {
+            **raw,
+            "content_hash": opportunity_content_hash(raw),
+            "classification_version": taxonomy.CLASSIFICATION_VERSION - 1,
+            "keywords": [],
+            "participation_mode": "unknown",
+            "regions": [],
+        }
+    }
+    result = service.enrich_opportunities([raw], existing)
+    assert result[0]["regions"] == ["서울"]
+    assert client.calls == ["opportunity_classification"]
+
+
+def test_local_region_fallback_uses_named_region_or_nationwide(taxonomy):
+    local = GeminiService(DisabledClient(), taxonomy, MemoryCache())
+    seoul = local.enrich_opportunities([raw_item("seoul")])[0]
+    nationwide_raw = raw_item("nationwide")
+    nationwide_raw["program_introduction"] = "누구나 참여 가능한 아이디어 공모전"
+    nationwide = local.enrich_opportunities([nationwide_raw])[0]
+    assert seoul["regions"] == ["서울"]
+    assert nationwide["regions"] == ["전국"]
 
 
 def test_user_display_values_and_normalized_keywords_are_separate_and_cached(taxonomy):

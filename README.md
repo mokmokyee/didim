@@ -30,6 +30,7 @@ GitHub Actions
 - Google 로그인 및 회원 프로필 저장
 - 검색 버튼 기반 의미 검색, 필터, 정렬
 - 표준 키워드 검색은 상위 분야로 확장하고, 미등록 검색어만 Gemini로 표준 키워드에 매핑
+- 공고의 지역 표기를 표준화하고 누락된 지역은 제목·기관·설명에서 보완
 - 관심 분야와 사용자 정보를 이용한 브라우저 기반 추천
 - 프로그램 저장 및 모집 상태별 저장목록
 - 로그인 사용자별 조회 기록
@@ -46,6 +47,7 @@ DiDim/
 │  ├─ data/search_taxonomy.json    # 배포용 표준 검색 키워드
 │  ├─ js/api.js                    # Auth·Firestore·Gemini REST API 연동
 │  ├─ js/search-resolver.js        # 표준 키워드 직접 판정과 응답 검증
+│  ├─ js/region-resolver.mjs       # 지역 정규화와 누락 지역 보완
 │  ├─ js/firebase-config.js        # 공개 Firebase 설정
 │  ├─ js/gemini-runtime-config.example.js # 배포 생성 파일 형식 예시
 │  └─ *.html
@@ -181,6 +183,7 @@ GitHub Actions의 `Run workflow`에서 `seed_only`를 선택하면 외부 사이
 .\.venv\Scripts\python.exe -m pytest -q tests
 npm run search-taxonomy:check
 node --test tests\search-resolver.test.js
+node --test tests\region-resolver.test.mjs
 node --check public\js\api.js
 node --check public\js\search-resolver.js
 node --check public\js\firebase-config.js

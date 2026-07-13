@@ -144,7 +144,11 @@ class OpportunityService:
                 reasons.append("선호 유형")
             mode = item.get("participation_mode")
             regions = set(item.get("regions", []))
-            if preferred_regions and (mode in {"online", "hybrid"} or preferred_regions.intersection(regions)):
+            if preferred_regions and (
+                mode in {"online", "hybrid"}
+                or "전국" in regions
+                or preferred_regions.intersection(regions)
+            ):
                 score += 10
                 reasons.append("선호 지역")
             score += min(int(item.get("view_count", 0)) // 500, 5)

@@ -73,6 +73,7 @@ def import_legacy_crawl_cache_if_empty(
             "view_count": 0,
             "save_count": 0,
             "keyword_taxonomy_version": taxonomy.version,
+            "classification_version": taxonomy.CLASSIFICATION_VERSION,
             "gemini_status": "local",
         }
         item.update(taxonomy.classify_local(item))

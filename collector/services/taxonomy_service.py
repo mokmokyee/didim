@@ -41,6 +41,7 @@ def opportunity_content_hash(item: dict[str, Any]) -> str:
 
 class TaxonomyService:
     MAX_KEYWORDS = 4
+    CLASSIFICATION_VERSION = 2
     PARTICIPATION_MODES = {"online", "offline", "hybrid", "unknown"}
 
     def __init__(self, data_dir: Path | None = None):
@@ -146,7 +147,9 @@ class TaxonomyService:
         )
         keywords = self.local_match([blob], self.MAX_KEYWORDS)
         participation_mode = self._local_participation_mode(blob)
-        regions = self._local_regions(blob) if participation_mode in {"offline", "hybrid"} else []
+        regions = self._local_regions(blob)
+        if not regions and participation_mode != "offline":
+            regions = ["전국"]
         return {
             "keywords": keywords,
             "participation_mode": participation_mode,
