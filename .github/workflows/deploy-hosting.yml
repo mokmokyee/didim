@@ -1,0 +1,50 @@
+name: Deploy DiDim hosting
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: didim-hosting-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install Firebase CLI
+        run: npm ci --ignore-scripts
+
+      - name: Prepare Firebase credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${FIREBASE_SERVICE_ACCOUNT_JSON:-}" ]; then
+            echo "::error title=Missing secret::FIREBASE_SERVICE_ACCOUNT_JSON is not configured."
+            exit 1
+          fi
+          credential_file="$RUNNER_TEMP/firebase-service-account.json"
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT_JSON" > "$credential_file"
+          chmod 600 "$credential_file"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$credential_file" >> "$GITHUB_ENV"
+
+      - name: Deploy Hosting and Firestore rules
+        run: npx firebase-tools deploy --only hosting,firestore:rules,firestore:indexes --project didim-5576e --non-interactive

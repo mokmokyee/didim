@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="디딤 - 고등학생·대학생을 위한 장학금·공모전 찾기">
+  <title>디딤 — 한 걸음 더 가까운 기회</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="home" class="glass-home">
+  <a href="#main" class="sr-only">본문으로 건너뛰기</a>
+
+  <div class="gh-bg" aria-hidden="true">
+    <img src="assets/hero-valley.png" alt="">
+    <div class="gh-bg__veil"></div>
+  </div>
+
+  <div class="gh-center">
+    <header class="gh-header">
+      <a href="index.html" class="gh-brand" aria-label="디딤 홈">
+        <span class="gh-brand__mark" aria-hidden="true">D</span>
+        <span>디딤</span>
+      </a>
+
+      <nav class="gh-pillnav" aria-label="주 메뉴">
+        <a href="index.html" data-nav="home" class="is-active">홈</a>
+        <a href="programs.html" data-nav="programs">프로그램</a>
+        <a href="recommend.html" data-nav="recommend">맞춤</a>
+        <a href="saved.html" data-nav="saved">저장</a>
+        <a href="mypage.html" data-nav="mypage">마이</a>
+      </nav>
+
+      <div class="gh-header__right">
+        <a href="login.html" class="gh-login">로그인</a>
+        <a href="signup.html" class="gh-cta">시작하기</a>
+        <button type="button" class="gh-menu menu-toggle" aria-label="메뉴 열기" aria-expanded="false"><span></span></button>
+      </div>
+    </header>
+
+    <main id="main" class="gh-stage">
+      <section class="gh-hero">
+        <p class="gh-badge">고등학생 · 대학생을 위한 기회 탐색</p>
+        <h1>산만하지 않게,<br>나에게 맞는 기회를 찾으세요</h1>
+        <p class="gh-lead">장학금과 공모전을 한곳에서 검색하고,<br>맞춤 추천과 마감 관리까지 이어집니다.</p>
+
+        <form id="home-search-form" class="gh-search" role="search">
+          <label for="home-search" class="sr-only">검색</label>
+          <input id="home-search" type="search" name="q" placeholder="장학금과 공모전을 검색해보세요" enterkeyhint="search">
+          <select id="home-type" name="type" aria-label="유형">
+            <option value="">유형</option>
+            <option value="장학금">장학금</option>
+            <option value="공모전">공모전</option>
+          </select>
+          <select id="home-target" name="target" aria-label="대상">
+            <option value="">대상</option>
+            <option value="고등학생">고등학생</option>
+            <option value="대학생">대학생</option>
+          </select>
+          <select id="home-field" name="category" hidden>
+            <option value="">전체</option>
+          </select>
+          <button type="submit" class="gh-search__btn">검색하기</button>
+        </form>
+
+        <div id="search-suggest" class="gh-suggest" aria-label="추천 검색어"></div>
+      </section>
+
+      <section class="gh-panels">
+        <div class="gh-panel">
+          <div class="gh-panel__head">
+            <h2>인기 프로그램</h2>
+            <a href="programs.html">전체보기</a>
+          </div>
+          <div id="popular-list" class="gh-rail"></div>
+        </div>
+
+        <div class="gh-panel">
+          <div class="gh-panel__head">
+            <h2>마감 임박</h2>
+            <a href="programs.html">더 보기</a>
+          </div>
+          <div id="urgent-list" class="gh-stack"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="mobile-overlay" aria-hidden="true"></div>
+  <nav class="mobile-nav" aria-label="모바일 메뉴">
+    <a href="index.html">홈</a>
+    <a href="programs.html">프로그램</a>
+    <a href="recommend.html">맞춤</a>
+    <a href="saved.html">저장목록</a>
+    <a href="mypage.html">마이페이지</a>
+    <a href="login.html">로그인</a>
+  </nav>
+
+  <nav class="bottom-nav" aria-label="하단 메뉴">
+    <a href="index.html" data-nav="home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10.5L12 4l8 6.5V20a1 1 0 01-1 1h-5v-6H10v6H5a1 1 0 01-1-1v-9.5z"/></svg>
+      홈
+    </a>
+    <a href="programs.html" data-nav="programs">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="7" height="7" rx="1.5"/><rect x="14" y="4" width="7" height="7" rx="1.5"/><rect x="3" y="13" width="7" height="7" rx="1.5"/><rect x="14" y="13" width="7" height="7" rx="1.5"/></svg>
+      프로그램
+    </a>
+    <a href="recommend.html" data-nav="recommend">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l2.2 4.5 5 .7-3.6 3.5.9 5L12 14.8 7.5 16.7l.9-5L4.8 8.2l5-.7L12 3z"/></svg>
+      맞춤
+    </a>
+    <a href="saved.html" data-nav="saved">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      저장
+    </a>
+    <a href="mypage.html" data-nav="mypage">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3.5"/><path d="M5 19.5c1.5-3.5 4-5 7-5s5.5 1.5 7 5"/></svg>
+      마이
+    </a>
+  </nav>
+
+  <article id="hero-feature" hidden></article>
+  <script src="js/api.js?v=20260713-1"></script>
+  <script src="js/main.js?v=20260713-4"></script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>회원가입 - 기본 정보 - 디딤</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="glass-app" data-page="signup">
+  <header class="topbar">
+    <div class="container topbar__inner">
+      <a href="index.html" class="logo"><span class="logo__mark">D</span><span>디딤</span></a>
+      <a href="login.html" class="btn btn-ghost btn-sm">로그인으로</a>
+    </div>
+  </header>
+  <main class="container auth-wrap">
+    <div class="auth-card">
+      <p class="signup-step-label">STEP 1 / 5</p>
+      <div class="signup-progress" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+      <h1>기본 정보</h1>
+      <p class="lead">Google 계정으로 시작한 뒤, 맞춤 추천에 필요한 정보를 알려주세요.</p>
+      <form id="signup-form" novalidate>
+        <div class="form-group">
+          <label for="signup-name">이름 *</label>
+          <input id="signup-name" class="form-control" type="text" required placeholder="홍길동">
+          <p class="form-error">이름을 입력해 주세요.</p>
+        </div>
+        <div class="form-group">
+          <label for="signup-email">이메일 *</label>
+          <input id="signup-email" class="form-control" type="email" required placeholder="you@gmail.com">
+          <p class="form-error">올바른 이메일을 입력해 주세요.</p>
+        </div>
+        <div class="form-group">
+          <label for="signup-birth">생년월일 *</label>
+          <input id="signup-birth" class="form-control" type="date" required>
+          <p class="form-error">생년월일을 선택해 주세요.</p>
+        </div>
+        <div class="signup-nav">
+          <button type="submit" class="btn btn-primary btn-block">다음</button>
+        </div>
+      </form>
+    </div>
+  </main>
+  <script src="js/api.js?v=20260713-1"></script>
+  <script src="js/main.js?v=20260713-4"></script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="맞춤 추천 - 디딤">
+  <title>맞춤 - 디딤</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="glass-app" data-page="recommend">
+  <header class="topbar">
+    <div class="container topbar__inner">
+      <a href="index.html" class="logo" aria-label="디딤 홈"><span class="logo__mark" aria-hidden="true">D</span><span>디딤</span></a>
+      <nav class="top-nav" aria-label="주 메뉴">
+        <a href="index.html" data-nav="home">홈</a>
+        <a href="programs.html" data-nav="programs">프로그램</a>
+        <a href="recommend.html" data-nav="recommend">맞춤</a>
+        <a href="saved.html" data-nav="saved">저장목록</a>
+        <a href="mypage.html" data-nav="mypage">마이페이지</a>
+      </nav>
+      <div class="topbar__actions">
+        <a href="login.html" class="btn btn-ghost btn-sm">로그인</a>
+        <a href="signup.html" class="btn btn-navy btn-sm">시작하기 <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" class="container" style="padding-bottom:40px">
+    <div class="page-title">
+      <h1>맞춤 추천</h1>
+      <p>회원 정보와 관심사를 바탕으로 어울리는 프로그램을 골라봤어요.</p>
+    </div>
+    <div id="recommend-root"></div>
+  </main>
+
+  <nav class="bottom-nav" aria-label="모바일 메뉴">
+    <a href="index.html" data-nav="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10.5L12 4l8 6.5V20a1 1 0 01-1 1h-5v-6H10v6H5a1 1 0 01-1-1v-9.5z"/></svg>홈</a>
+    <a href="programs.html" data-nav="programs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="7" height="7" rx="1.5"/><rect x="14" y="4" width="7" height="7" rx="1.5"/><rect x="3" y="13" width="7" height="7" rx="1.5"/><rect x="14" y="13" width="7" height="7" rx="1.5"/></svg>프로그램</a>
+    <a href="recommend.html" data-nav="recommend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l2.2 4.5 5 .7-3.6 3.5.9 5L12 14.8 7.5 16.7l.9-5L4.8 8.2l5-.7L12 3z"/></svg>맞춤</a>
+    <a href="saved.html" data-nav="saved"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>저장목록</a>
+    <a href="mypage.html" data-nav="mypage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3.5"/><path d="M5 19.5c1.5-3.5 4-5 7-5s5.5 1.5 7 5"/></svg>마이</a>
+  </nav>
+  <script src="js/api.js?v=20260713-1"></script>
+  <script src="js/main.js?v=20260713-4"></script>
+</body>
+</html>

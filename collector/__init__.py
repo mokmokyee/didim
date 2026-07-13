@@ -1,0 +1,1 @@
+"""DiDim scheduled opportunity collector."""

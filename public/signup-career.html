@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>회원가입 - 관심 분야 - 디딤</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="glass-app" data-page="signup-career">
+  <header class="topbar">
+    <div class="container topbar__inner">
+      <a href="index.html" class="logo"><span class="logo__mark">D</span><span>디딤</span></a>
+      <a href="login.html" class="btn btn-ghost btn-sm">로그인으로</a>
+    </div>
+  </header>
+  <main class="container auth-wrap">
+    <div class="auth-card">
+      <p class="signup-step-label">STEP 3 / 5</p>
+      <div class="signup-progress" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+      <h1>관심 분야</h1>
+      <p class="lead">관심 있는 분야를 모두 선택해 주세요. 맞춤 추천에 활용돼요.</p>
+      <form id="signup-form" novalidate>
+        <div class="form-group">
+          <label>관심 분야 * (복수 선택)</label>
+          <div class="chip-select">
+            <label><input type="checkbox" name="interest" value="교육"> 교육</label>
+            <label><input type="checkbox" name="interest" value="IT·기술"> IT·기술</label>
+            <label><input type="checkbox" name="interest" value="디자인"> 디자인</label>
+            <label><input type="checkbox" name="interest" value="예술"> 예술</label>
+            <label><input type="checkbox" name="interest" value="환경"> 환경</label>
+            <label><input type="checkbox" name="interest" value="사회공헌"> 사회공헌</label>
+            <label><input type="checkbox" name="interest" value="창업"> 창업</label>
+            <label><input type="checkbox" name="interest" value="금융"> 금융</label>
+            <label><input type="checkbox" name="interest" value="마케팅"> 마케팅</label>
+            <label><input type="checkbox" name="interest" value="콘텐츠"> 콘텐츠</label>
+            <label><input type="checkbox" name="interest" value="기타"> 기타</label>
+          </div>
+          <input id="custom-interest" class="form-control" style="margin-top:8px" type="text" placeholder="직접 입력 (선택)">
+          <p class="form-error">기타 분야를 직접 입력해 주세요.</p>
+        </div>
+        <div class="signup-nav">
+          <a href="signup-scholarship.html" class="btn btn-outline">이전</a>
+          <button type="submit" class="btn btn-primary btn-block">다음</button>
+        </div>
+      </form>
+    </div>
+  </main>
+  <script src="js/api.js?v=20260713-1"></script>
+  <script src="js/main.js?v=20260713-4"></script>
+</body>
+</html>

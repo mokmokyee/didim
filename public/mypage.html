@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>마이페이지 - 디딤</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="glass-app" data-page="mypage">
+  <header class="topbar">
+    <div class="container topbar__inner">
+      <a href="index.html" class="logo"><span class="logo__mark">D</span><span>디딤</span></a>
+      <nav class="top-nav" aria-label="주 메뉴">
+        <a href="index.html" data-nav="home">홈</a>
+        <a href="programs.html" data-nav="programs">프로그램</a>
+        <a href="recommend.html" data-nav="recommend">맞춤</a>
+        <a href="saved.html" data-nav="saved">저장목록</a>
+        <a href="mypage.html" data-nav="mypage">마이페이지</a>
+      </nav>
+      <div class="topbar__actions">
+        <a href="login.html" class="btn btn-ghost btn-sm">로그인</a>
+        <a href="signup.html" class="btn btn-navy btn-sm">시작하기 <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" class="container" style="padding-bottom:48px">
+    <div class="page-title"><h1>마이페이지</h1></div>
+
+    <section id="mypage-guest" hidden>
+      <div class="profile-card">
+        <h2 style="margin-bottom:8px">로그인하고 맞춤 기회를 받아보세요</h2>
+        <p style="color:var(--text-2);margin-bottom:16px">Google 계정으로 간편하게 시작할 수 있어요.</p>
+        <a href="login.html" class="btn btn-primary btn-block">Google로 로그인 / 회원가입</a>
+        <ul class="benefit-list">
+          <li>나이·관심 분야 기반 맞춤 추천</li>
+          <li>저장한 프로그램 마감 알림</li>
+          <li>여러 기기에서 이어보기 (프로토타입: 이 기기 저장)</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="mypage-member" hidden>
+      <div class="profile-card">
+        <div class="profile-head">
+          <div class="avatar" id="mp-avatar">?</div>
+          <div>
+            <strong id="mp-name" style="font-size:1.15rem">회원</strong>
+            <p id="mp-sub" style="color:var(--text-2);font-size:0.88rem;margin-top:2px"></p>
+          </div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-box"><strong id="mp-saved-count">0</strong><span>저장한 프로그램</span></div>
+          <div class="stat-box"><strong>—</strong><span>맞춤 추천</span></div>
+          <div class="stat-box"><strong>ON</strong><span>알림</span></div>
+        </div>
+        <div class="menu-list">
+          <button type="button" id="open-edit-profile">프로필·관심사 수정 <span>›</span></button>
+          <a href="saved.html">저장목록 보기 <span>›</span></a>
+          <a href="recommend.html">맞춤 추천 보기 <span>›</span></a>
+        </div>
+      </div>
+
+      <div class="profile-card" style="margin-top:14px">
+        <h2 style="font-size:1.05rem;margin-bottom:8px">알림 설정</h2>
+        <div class="switch-row">
+          <span>저장 프로그램 마감 7일 전</span>
+          <label class="switch"><input type="checkbox" data-notif-setting="deadline7"><span></span></label>
+        </div>
+        <div class="switch-row">
+          <span>저장 프로그램 마감 3일 전</span>
+          <label class="switch"><input type="checkbox" data-notif-setting="deadline3"><span></span></label>
+        </div>
+        <div class="switch-row">
+          <span>저장 프로그램 마감 1일 전</span>
+          <label class="switch"><input type="checkbox" data-notif-setting="deadline1"><span></span></label>
+        </div>
+        <div class="switch-row" style="border-bottom:0">
+          <span>관심 분야 새 프로그램</span>
+          <label class="switch"><input type="checkbox" data-notif-setting="newInterest"><span></span></label>
+        </div>
+      </div>
+
+      <div class="profile-card" style="margin-top:14px">
+        <h2 style="font-size:1.05rem;margin-bottom:12px">최근 본 프로그램</h2>
+        <div id="mp-recent"></div>
+      </div>
+
+      <div class="menu-list profile-card" style="margin-top:14px">
+        <button type="button" id="logout-btn">로그아웃</button>
+        <button type="button" id="withdraw-btn" class="danger">회원 탈퇴</button>
+      </div>
+    </section>
+  </main>
+
+  <div id="edit-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="edit-title">
+    <div class="modal">
+      <h2 id="edit-title">프로필 수정</h2>
+      <form id="edit-profile-form">
+        <div class="form-group">
+          <label for="edit-name">이름</label>
+          <input id="edit-name" class="form-control" type="text">
+        </div>
+        <div class="form-group">
+          <label for="edit-birth">생년월일</label>
+          <input id="edit-birth" class="form-control" type="date">
+        </div>
+        <div class="form-group">
+          <label>사용자 유형</label>
+          <div class="chip-select">
+            <label><input type="radio" name="editUserType" value="고등학생"> 고등학생</label>
+            <label><input type="radio" name="editUserType" value="대학생"> 대학생</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>관심 분야</label>
+          <div class="chip-select">
+            <label><input type="checkbox" name="editInterest" value="교육"> 교육</label>
+            <label><input type="checkbox" name="editInterest" value="IT·기술"> IT·기술</label>
+            <label><input type="checkbox" name="editInterest" value="디자인"> 디자인</label>
+            <label><input type="checkbox" name="editInterest" value="예술"> 예술</label>
+            <label><input type="checkbox" name="editInterest" value="환경"> 환경</label>
+            <label><input type="checkbox" name="editInterest" value="사회공헌"> 사회공헌</label>
+            <label><input type="checkbox" name="editInterest" value="창업"> 창업</label>
+            <label><input type="checkbox" name="editInterest" value="금융"> 금융</label>
+            <label><input type="checkbox" name="editInterest" value="마케팅"> 마케팅</label>
+            <label><input type="checkbox" name="editInterest" value="콘텐츠"> 콘텐츠</label>
+            <label><input type="checkbox" name="editInterest" value="기타"> 기타</label>
+          </div>
+          <input id="edit-custom-interest" class="form-control" style="margin-top:8px" type="text" placeholder="직접 입력">
+        </div>
+        <div class="form-group">
+          <label>선호 지역</label>
+          <div class="chip-select">
+            <label><input type="checkbox" name="editRegion" value="전국"> 전국</label>
+            <label><input type="checkbox" name="editRegion" value="서울"> 서울</label>
+            <label><input type="checkbox" name="editRegion" value="경기"> 경기</label>
+            <label><input type="checkbox" name="editRegion" value="인천"> 인천</label>
+            <label><input type="checkbox" name="editRegion" value="부산"> 부산</label>
+            <label><input type="checkbox" name="editRegion" value="대구"> 대구</label>
+            <label><input type="checkbox" name="editRegion" value="대전"> 대전</label>
+            <label><input type="checkbox" name="editRegion" value="광주"> 광주</label>
+            <label><input type="checkbox" name="editRegion" value="울산"> 울산</label>
+            <label><input type="checkbox" name="editRegion" value="세종"> 세종</label>
+            <label><input type="checkbox" name="editRegion" value="강원"> 강원</label>
+            <label><input type="checkbox" name="editRegion" value="충북"> 충북</label>
+            <label><input type="checkbox" name="editRegion" value="충남"> 충남</label>
+            <label><input type="checkbox" name="editRegion" value="전북"> 전북</label>
+            <label><input type="checkbox" name="editRegion" value="전남"> 전남</label>
+            <label><input type="checkbox" name="editRegion" value="경북"> 경북</label>
+            <label><input type="checkbox" name="editRegion" value="경남"> 경남</label>
+            <label><input type="checkbox" name="editRegion" value="제주"> 제주</label>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="close-edit-profile" class="btn btn-outline">취소</button>
+          <button type="submit" class="btn btn-primary">저장</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <nav class="bottom-nav" aria-label="모바일 메뉴">
+    <a href="index.html" data-nav="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10.5L12 4l8 6.5V20a1 1 0 01-1 1h-5v-6H10v6H5a1 1 0 01-1-1v-9.5z"/></svg>홈</a>
+    <a href="programs.html" data-nav="programs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="7" height="7" rx="1.5"/><rect x="14" y="4" width="7" height="7" rx="1.5"/><rect x="3" y="13" width="7" height="7" rx="1.5"/><rect x="14" y="13" width="7" height="7" rx="1.5"/></svg>프로그램</a>
+    <a href="recommend.html" data-nav="recommend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l2.2 4.5 5 .7-3.6 3.5.9 5L12 14.8 7.5 16.7l.9-5L4.8 8.2l5-.7L12 3z"/></svg>맞춤</a>
+    <a href="saved.html" data-nav="saved"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>저장목록</a>
+    <a href="mypage.html" data-nav="mypage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3.5"/><path d="M5 19.5c1.5-3.5 4-5 7-5s5.5 1.5 7 5"/></svg>마이</a>
+  </nav>
+  <script src="js/api.js?v=20260713-1"></script>
+  <script src="js/main.js?v=20260713-4"></script>
+</body>
+</html>

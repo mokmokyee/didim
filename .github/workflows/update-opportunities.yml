@@ -1,0 +1,64 @@
+name: Update DiDim opportunities
+
+on:
+  workflow_dispatch:
+    inputs:
+      seed_only:
+        description: Publish bundled data without crawling
+        required: false
+        default: false
+        type: boolean
+  schedule:
+    - cron: "17 */6 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: didim-opportunity-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-3.1-flash-lite' }}
+      GEMINI_INTERNAL_RPM: "14"
+      GEMINI_INTERNAL_RPD: "480"
+      FIREBASE_PROJECT_ID: didim-5576e
+      FIREBASE_STORAGE_BUCKET: didim-5576e.firebasestorage.app
+      FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: python -m pip install --upgrade pip && pip install -r requirements.txt
+
+      - name: Validate secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          for name in GEMINI_API_KEY FIREBASE_SERVICE_ACCOUNT_JSON; do
+            if [ -z "${!name:-}" ]; then
+              echo "::error title=Missing secret::${name} is not configured."
+              exit 1
+            fi
+          done
+
+      - name: Publish bundled data
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.seed_only }}
+        run: python -m collector.main --seed-only
+
+      - name: Crawl and publish opportunities
+        if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.seed_only) }}
+        run: python -m collector.main

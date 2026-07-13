@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>회원가입 - 사용자 유형 - 디딤</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="glass-app" data-page="signup-scholarship">
+  <header class="topbar">
+    <div class="container topbar__inner">
+      <a href="index.html" class="logo"><span class="logo__mark">D</span><span>디딤</span></a>
+      <a href="login.html" class="btn btn-ghost btn-sm">로그인으로</a>
+    </div>
+  </header>
+  <main class="container auth-wrap">
+    <div class="auth-card">
+      <p class="signup-step-label">STEP 2 / 5</p>
+      <div class="signup-progress" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+      <h1>사용자 유형</h1>
+      <p class="lead">현재 어떤 신분인지 알려주시면 딱 맞는 프로그램을 추천해 드려요.</p>
+      <form id="signup-form" novalidate>
+        <div class="form-group" id="userType-group">
+          <label>사용자 유형 *</label>
+          <div class="chip-select">
+            <label><input type="radio" name="userType" value="고등학생"> 고등학생</label>
+            <label><input type="radio" name="userType" value="대학생"> 대학생</label>
+          </div>
+          <p class="form-error">유형을 선택해 주세요.</p>
+        </div>
+        <div class="signup-nav">
+          <a href="signup.html" class="btn btn-outline">이전</a>
+          <button type="submit" class="btn btn-primary btn-block">다음</button>
+        </div>
+      </form>
+    </div>
+  </main>
+  <script src="js/api.js?v=20260713-1"></script>
+  <script src="js/main.js?v=20260713-4"></script>
+</body>
+</html>

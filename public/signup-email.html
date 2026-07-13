@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>회원가입 - 최종 확인 - 디딤</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="glass-app" data-page="signup-email">
+  <header class="topbar">
+    <div class="container topbar__inner">
+      <a href="index.html" class="logo"><span class="logo__mark">D</span><span>디딤</span></a>
+      <a href="login.html" class="btn btn-ghost btn-sm">로그인으로</a>
+    </div>
+  </header>
+  <main class="container auth-wrap">
+    <div class="auth-card">
+      <p class="signup-step-label">STEP 5 / 5</p>
+      <div class="signup-progress" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+      <h1>최종 확인</h1>
+      <p class="lead">입력하신 정보를 확인하고 가입을 완료해 주세요.</p>
+      <div id="signup-summary"></div>
+      <form id="signup-form" novalidate style="margin-top:18px">
+        <label class="check-row">
+          <input id="signup-agree" type="checkbox">
+          <span>개인정보 수집 및 이용에 동의합니다. (필수)</span>
+        </label>
+        <div class="signup-nav">
+          <a href="signup-password.html" class="btn btn-outline">이전</a>
+          <button type="submit" class="btn btn-primary btn-block">가입 완료</button>
+        </div>
+      </form>
+    </div>
+  </main>
+  <script src="js/api.js?v=20260713-1"></script>
+  <script src="js/main.js?v=20260713-4"></script>
+</body>
+</html>
